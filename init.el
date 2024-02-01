@@ -1,6 +1,18 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (add-to-list 'load-path "~/.emacs.d/plugins/")
 
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(use-package some-package
+  :defer t)
+
+(setq gc-cons-threshold (* 300 1024 1024)) ;; 300 MB
+
 (load "vertico-config")
 
 (use-package doom-themes
@@ -14,12 +26,21 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
-;;(setq make-backup-files nil)
+(setq make-backup-files nil)
 (setq auto-save-default nil)
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-c a") 'beginning-of-buffer)
+(global-set-key (kbd "C-c z") 'end-of-buffer)
 (global-display-line-numbers-mode t)
 ;;(setq display-line-numbers-type 'relative)
+
+(use-package eyebrowse
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c q") 'eyebrowse-prev-window-config)
+  (global-set-key (kbd "C-c w") 'eyebrowse-next-window-config)
+  (global-set-key (kbd "C-c C-w <number>") 'eyebrowse-switch-to-window-config-<number>)
+  (eyebrowse-mode t))
 
 ;; open shell
 (defun open-term-in-split-window ()
@@ -37,12 +58,15 @@
 (global-set-key (kbd "C-x C-u") 'open-term-in-split-window)
 (global-set-key (kbd "C-x C-y") 'open-term-in-split-window-emacs)
 
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(use-package highlight-indent-guides
+  :ensure t
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :config
+  (setq highlight-indent-guides-method 'character))
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(use-package rainbow-delimiters
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package neotree
   :ensure t
@@ -109,14 +133,6 @@
   :after lsp
   :config
   (add-hook 'java-mode-hook 'lsp))
-
-(use-package eyebrowse
-  :ensure t
-  :config
-  (eyebrowse-mode t))
-(global-set-key (kbd "C-c C-w C-n") 'eyebrowse-prev-window-config)
-(global-set-key (kbd "C-c C-w C-p") 'eyebrowse-next-window-config)
-(global-set-key (kbd "C-c C-w <number>") 'eyebrowse-switch-to-window-config-<number>)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
